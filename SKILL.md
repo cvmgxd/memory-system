@@ -29,12 +29,32 @@ A lightweight markdown-based memory system that gives AI coding agents persisten
 
 ## Setup (one-time)
 
-1. Create the directory structure under `~/.opencode/memory/`
+1. Create directories:
+```bash
+mkdir -p ~/.opencode/memory/{decisions,lessons,preferences,handoffs,projects,templates}
+```
 2. Copy `templates/` files into `~/.opencode/memory/templates/`
-3. Add the Memory Protocol block to both:
-   - `~/.config/opencode/AGENTS.md` (global rules)
-   - `<project>/AGENTS.md` (project rules)
-4. Copy the slash commands into `.opencode/commands/`
+3. Add to `~/.config/opencode/AGENTS.md`:
+
+```markdown
+## Memory Protocol
+
+**Boot (EVERY session — MANDATORY):**
+1. Read `~/.opencode/memory/_index.md` — scan topics, recent, and project list (the map of ALL memories)
+2. If current workspace matches a project, read `~/.opencode/memory/projects/<name>/overview.md`
+3. If task matches a topic tag, grep `~/.opencode/memory/` and read 1-3 matched files
+4. Present brief confirmation: total entries, any relevant context found
+
+**During session (auto-write — no command needed):**
+After a decision, bug fix, or new preference: write to `~/.opencode/memory/<decisions|lessons|preferences>/<slug>.md` then run `/memory index`.
+
+**Session end:** Run `/memory handoff`
+
+**Entry format:** `> date | kind | tags` convention line. Kinds: decision, lesson, preference, handoff, note, bug.
+```
+
+4. Copy `commands/*.md` into `.opencode/commands/`
+5. Create initial `~/.opencode/memory/_index.md` (see template below)
 
 ## Boot Protocol (what the agent does)
 
