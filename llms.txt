@@ -1,0 +1,42 @@
+# Memory System
+
+A lightweight markdown-based persistent memory system for AI coding agents. Zero dependencies.
+
+## Problem
+AI coding agents forget everything between sessions. You repeat preferences, re-explain architecture decisions, and the agent makes the same mistakes across sessions and projects.
+
+## Solution
+A global markdown memory bank with a lightweight index. The agent reads `~/.opencode/memory/_index.md` at boot (~200 tokens) to get a map of all memories, then loads specific files on demand via grep and file reads.
+
+## Architecture
+- `~/.opencode/memory/_index.md` — The map: topics, recent entries, project list
+- `decisions/` — Architecture/technical decisions (global)
+- `lessons/` — Bugs, patterns, gotchas (global)
+- `preferences/` — Coding style, workflow rules (global)
+- `handoffs/` — Session handoffs
+- `projects/<name>/` — Per-project: overview.md, decisions/, lessons/
+
+## How to install
+```bash
+git clone https://github.com/cvmgxd/memory-system.git
+mkdir -p ~/.opencode/memory/{decisions,lessons,preferences,handoffs,projects,templates}
+cp memory-system/templates/*.md ~/.opencode/memory/templates/
+cp memory-system/commands/*.md .opencode/commands/
+# Then add the Memory Protocol block to ~/.config/opencode/AGENTS.md
+```
+
+## Key design choices
+- Boot protocol reads only _index.md (~200 tokens)
+- Agent auto-writes when it detects durable decisions/lessons/preferences
+- grep for search, no search engine
+- Global index with per-project isolation
+- Zero infrastructure: no databases, servers, API keys, npm packages
+- Works with: OpenCode, Claude Code, Cursor, any agent that reads files
+
+## Commands
+- /memory save — save durable context from session
+- /memory index — rebuild index from all entries
+- /memory handoff — write end-of-session summary
+
+## Tags
+ai-agent-memory, persistent-memory, opencode, coding-agent, markdown-memory, agent-context, memory-bank, cross-session-memory, zero-dependency, local-first
