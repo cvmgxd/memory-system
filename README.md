@@ -8,21 +8,29 @@
 
 ## The Problem
 
-Every AI coding session starts with amnesia. Your agent doesn't know:
+I work across multiple projects — game engines (Godot, Unreal), programming tools (Olamma, Sage Writer), and random utilities. Every time I started a new coding session, my AI agent forgot everything:
 
-- What architecture decision you made last week
-- That you prefer composition over inheritance
-- Which model keeps forgetting to run tests
-- What bug you fixed yesterday and how
-- That you work across Godot, Unreal, and web projects
+- The Unreal lesson I learned last week in a *different* project doesn't carry over
+- My preference for "never deliver untested code" needs to be repeated to every session
+- DeepSeek Flash keeps forgetting to compile — and I have to remind it every time
+- I want the agent to know I prefer GDScript for Godot prototypes but C++ for Unreal gameplay
 
-You end up repeating yourself. Every. Single. Session. The agent wastes time rediscovering what you already taught it, or worse — makes the same mistakes again.
+I first built **RLM** — a 600-line Node.js MCP server with TF-IDF search, NDJSON storage, and a JSON-RPC transport. It worked, but it was fragile: 30-second MCP startup timeouts on Windows, a complex bootstrap protocol, cache invalidation bugs, and 677 mostly-irrelevant entries cluttering the search index.
 
-ChatGPT doesn't remember you. Claude Code forgets between projects. Cursor starts fresh every time. OpenCode boots with a blank slate.
+I looked at the alternatives:
+
+- **Claude Code's auto-memory** — per-project only. My Unreal lessons don't follow me to Godot.
+- **Mem0** — Docker, Postgres, OpenAI API keys. 55k stars but needs a server, costs money per operation, can't run offline.
+- **ClawMem** — SQLite + llama.cpp + GPU. Incredibly powerful, but I don't want to run 3 models on my GPU for a memory system.
+- **Cline Memory Bank** — 6 canonical files, great concept, but per-project only and came with a lot of ceremony around software specs I don't need.
+
+None of them solved the actual thing I wanted: **a global memory that follows me across all projects, with enough context awareness to know which lessons apply where, zero infrastructure, and a boot time measured in milliseconds.**
 
 ## The Solution
 
-A global markdown memory bank with a lightweight index that the agent reads at session start. It uses the same tools the agent already has — read files, grep, write files — with zero extra infrastructure.
+Drop the search engine. Drop the MCP server. Drop the database. The AI agent is already the smartest thing in the room — let it decide what's relevant.
+
+A global markdown memory bank with a lightweight index. At session start, the agent reads `_index.md` (~200 tokens — the map of everything). It knows which project it's in, filtres context accordingly, and loads detail on demand via grep and file reads. It uses the same tools it already has — read, grep, write, edit — with zero extra infrastructure.
 
 ```mermaid
 graph TD
